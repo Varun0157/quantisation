@@ -1,0 +1,9 @@
+name: anlp-a4
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pytorch
+  - pytorch-cuda=12.4
+  - transformers
+prefix: /home/varun/miniconda3/envs/anlp-a4
