@@ -1,18 +1,35 @@
 import shutil
 import os
 
-from transformers import GPTNeoForCausalLM, GPT2Tokenizer
+from transformers import (
+    GPTNeoForCausalLM,
+    GPT2Tokenizer,
+    AutoModelForCausalLM,
+    AutoTokenizer,
+)
 
-model_name = "EleutherAI/gpt-neo-125m"
-tokenizer = GPT2Tokenizer.from_pretrained(model_name)
-model = GPTNeoForCausalLM.from_pretrained(model_name)
+gpt_neo_model_name = "EleutherAI/gpt-neo-125m"
+gpt_neo_tokenizer = GPT2Tokenizer.from_pretrained(gpt_neo_model_name)
+gpt_neo_model = GPTNeoForCausalLM.from_pretrained(gpt_neo_model_name)
+
+fb_opt_model_name = "facebook/opt-125m"
+fb_opt_tokenizer = AutoTokenizer.from_pretrained(fb_opt_model_name)
+fb_opt_model = AutoModelForCausalLM.from_pretrained(fb_opt_model_name)
+
+
+def save_models(model, tokenizer, local_save_path, model_alias):
+    # save the model and tokenizer
+    tok_path = os.path.join(local_save_path, model_alias + "_tokenizer")
+    shutil.rmtree(tok_path, ignore_errors=True)
+    tokenizer.save_pretrained(os.path.join(local_save_path, model_alias + "_tokenizer"))
+
+    mod_path = os.path.join(local_save_path, model_alias + "_model")
+    shutil.rmtree(mod_path, ignore_errors=True)
+    model.save_pretrained(os.path.join(local_save_path, model_alias + "_model"))
+
+    print(f"saved {model_alias} model and tokenizer to {local_save_path}")
+
 
 local_save_path = "models"
-model_alias = "gpt-neo"
-
-# delete local save path
-shutil.rmtree(local_save_path, ignore_errors=True)
-
-# save the model and tokenizer
-tokenizer.save_pretrained(os.path.join(local_save_path, model_alias + "_tokenizer"))
-model.save_pretrained(os.path.join(local_save_path, model_alias + "_model"))
+save_models(gpt_neo_model, gpt_neo_tokenizer, local_save_path, "gpt-neo")
+save_models(fb_opt_model, fb_opt_tokenizer, local_save_path, "fb-opt")
