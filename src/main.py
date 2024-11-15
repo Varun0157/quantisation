@@ -1,4 +1,4 @@
-import logging 
+import logging
 
 import torch
 
@@ -7,18 +7,30 @@ from src.model import GPTNeo
 from src.utils import calculate_perplexity
 
 
+def run_model(
+    model: torch.nn.Module,
+    dataloader: torch.utils.data.DataLoader,
+):
+    perplexity, avg_time = calculate_perplexity(model, dataloader)
+    print(f"perplexity: {perplexity}")
+    print(f"average inference time: {avg_time}")
+
+    mem_used_mb = torch.cuda.memory_allocated() / 1024**2
+    print(f"memory used: {mem_used_mb:.2f} MB")
+
+
 def main():
     logging.basicConfig(level=logging.INFO)
 
-    device = torch.device("cuda" if torch.cuda.is_available() and False else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = GPTNeo("./models", device)
-    # model.quantize()
 
-    dataset = PennTreeBank()
-    dataloader = get_dataloader(dataset, batch_size=1)
+    dataloader = get_dataloader(PennTreeBank(), batch_size=1)
+    run_model(model, dataloader)
 
-    perplexity = calculate_perplexity(model, dataloader)
-    print(f"perplexity: {perplexity}")
+    model.quantize()
+
+    run_model(model, dataloader)
 
 
 if __name__ == "__main__":
