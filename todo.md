@@ -1,1 +1,3 @@
 - [ ] consider making the model return logits instead of the PretrainedModel output
+  - [ ] in report, justify the use of PreTrainedModel loss if not. It uses CrossEntropy internally, etc. 
+- [ ] any way to avoid all the `# type: ignore`'s?
