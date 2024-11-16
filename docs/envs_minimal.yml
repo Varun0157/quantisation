@@ -3,8 +3,10 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - datasets
   - pytorch
   - pytorch-cuda=12.4
+  - torchaudio
+  - torchvision
+  - datasets
   - transformers
 prefix: /home/varun/miniconda3/envs/anlp-a4
