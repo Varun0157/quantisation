@@ -1,5 +1,3 @@
-import math
-import time
 from typing import Tuple
 
 from tqdm import tqdm
@@ -9,27 +7,31 @@ from torch.utils.data import DataLoader
 
 
 def calculate_perplexity(
-    model: nn.Module, dataloader: DataLoader
+    model: nn.Module, dataloader: DataLoader, device: torch.device
 ) -> Tuple[float, float]:
     model.eval()
 
-    total_words = len(dataloader.dataset)  # type: ignore
+    total_samples = len(dataloader.dataset)  # type: ignore
     total_loss = 0.0
-    total_inference_time = 0.0
+
+    total_latency = 0.0
+    start_time = torch.cuda.Event(enable_timing=True)
+    end_time = torch.cuda.Event(enable_timing=True)
 
     for sentences in tqdm(dataloader, "calculating perplexity...", ascii=" ▖▘▝▗▚▞█"):
         with torch.no_grad():
-            start_time = time.time()
+            start_time.record(stream=torch.cuda.current_stream())
             outputs = model(sentences)
-            total_inference_time += time.time() - start_time
+            end_time.record(stream=torch.cuda.current_stream())
+            torch.cuda.synchronize()
 
             loss = outputs.loss
+            total_latency += start_time.elapsed_time(end_time)
 
         assert not torch.isnan(loss).any(), f"NaN loss in batch {sentences}"
         total_loss += loss.item()
 
-    assert total_words > 0, "no successful inferences"
-    perplexity = math.exp(total_loss / total_words)
+    perplexity = 2 ** (total_loss / total_samples)
+    average_latency = total_latency / total_samples
 
-    average_inference_time = total_inference_time / total_words
-    return perplexity, average_inference_time
+    return perplexity, average_latency
