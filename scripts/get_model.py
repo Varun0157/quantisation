@@ -2,15 +2,13 @@ import shutil
 import os
 
 from transformers import (
-    GPTNeoForCausalLM,
-    GPT2Tokenizer,
     AutoModelForCausalLM,
     AutoTokenizer,
 )
 
 gpt_neo_model_name = "EleutherAI/gpt-neo-125m"
-gpt_neo_tokenizer = GPT2Tokenizer.from_pretrained(gpt_neo_model_name)
-gpt_neo_model = GPTNeoForCausalLM.from_pretrained(gpt_neo_model_name)
+gpt_neo_tokenizer = AutoTokenizer.from_pretrained(gpt_neo_model_name)
+gpt_neo_model = AutoModelForCausalLM.from_pretrained(gpt_neo_model_name)
 
 fb_opt_model_name = "facebook/opt-125m"
 fb_opt_tokenizer = AutoTokenizer.from_pretrained(fb_opt_model_name)
