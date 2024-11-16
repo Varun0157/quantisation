@@ -24,13 +24,13 @@ class PennTreeBank(Dataset):
 
     def __init__(self, num_sentences: int | None = None) -> None:
         logging.info(f"Loading {self.name} dataset...")
-        dataset = load_dataset("ptb_text_only", "penn_treebank")
+        dataset = load_dataset("ptb_text_only", "penn_treebank", trust_remote_code=True)
         assert type(dataset) == DatasetDict
 
         self.texts = clean(
             dataset["test"]["sentence"]
             + dataset["validation"]["sentence"]
-            + dataset["train"]["sentence"]
+            # + dataset["train"]["sentence"]
         )
 
         assert num_sentences is None or num_sentences <= len(
@@ -55,7 +55,7 @@ class Wikipedia(Dataset):
 
     def __init__(self, num_sentences: int | None = None) -> None:
         logging.info(f"Loading {self.name} dataset...")
-        dataset = load_dataset("wikipedia", "20220301.en")
+        dataset = load_dataset("wikipedia", "20220301.en", trust_remote_code=True)
         assert type(dataset) == DatasetDict
 
         self.texts = clean(

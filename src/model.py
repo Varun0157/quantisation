@@ -1,11 +1,12 @@
 import os
 import logging
+from typing import List
 
 import torch
 import torch.nn as nn
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from src.from_scratch import quantize_linear_layers
+from src.from_scratch import quantize_layers
 
 
 class AutoModel(nn.Module):
@@ -22,10 +23,20 @@ class AutoModel(nn.Module):
             self.mod_path
         )
         self.model.to(self.device)  # type: ignore
+        self.model.eval()  # type: ignore
 
-    def quantize_custom(self, goal_dtype: torch.dtype = torch.int8):
-        logging.info(f"quantizing model to {goal_dtype} ...")
-        quantize_linear_layers(self.model, goal_dtype, self.device)
+    def quantize_custom(
+        self,
+        goal_dtype: torch.dtype = torch.int8,
+        select_layers: List[str] | None = None,
+    ):
+        layers_selected = (
+            f"all layers" if select_layers is None else f"layers {select_layers}"
+        )
+        logging.info(
+            f"quantizing {layers_selected} of model to {goal_dtype} (linear) ..."
+        )
+        quantize_layers(self.model, goal_dtype, self.device, select_layers)
 
     def memory_footprint(self):
         return self.model.get_memory_footprint()  # type: ignore
