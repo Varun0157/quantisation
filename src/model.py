@@ -4,7 +4,7 @@ from typing import List
 
 import torch
 import torch.nn as nn
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 from src.from_scratch import quantize_layers
 
@@ -37,6 +37,27 @@ class AutoModel(nn.Module):
             f"quantizing {layers_selected} of model to {goal_dtype} (linear) ..."
         )
         quantize_layers(self.model, goal_dtype, self.device, select_layers)
+
+    def bnb_quantize(self, num_bytes: int, nf4: bool = False):
+        assert num_bytes in [4, 8], "only [4, 8] bytes supported"
+        quant_type = "nf4" if nf4 else "linear"
+        logging.info(
+            f"quantizing model to {num_bytes} bytes using bits_and_bytes {quant_type} ..."
+        )
+
+        quant_type = "nf4" if nf4 else "fp4"
+        if num_bytes == 4:
+            bnb_config = BitsAndBytesConfig(
+                load_in_4bit=True, bnb_4bit_quant_type=quant_type
+            )
+        else:
+            bnb_config = BitsAndBytesConfig(
+                load_in_8bit=True, bnb_8bit_quant_type=quant_type
+            )
+
+        self.model = AutoModelForCausalLM.from_pretrained(
+            self.mod_path, quantization_config=bnb_config, torch_dtype=torch.float32
+        )
 
     def memory_footprint(self):
         return self.model.get_memory_footprint()  # type: ignore
