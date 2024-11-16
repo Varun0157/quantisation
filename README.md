@@ -12,3 +12,5 @@ Types include `custom_whole`, `custom_selective`, `bnb_4`, `bnb_8`, `bnb_nf4` an
 
 The model gets saved to `quantized`. Run it the same way you did before, instead on the evaluate model, to evaluate:
 `python -m src.evaluate --q_type <type>`. 
+
+Trained models can be found here: https://drive.google.com/drive/folders/1lHQnaPGtltS_SNNqdw4MLhvGHB0xKP1l?usp=sharing
