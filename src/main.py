@@ -1,37 +1,43 @@
 import logging
 
+from numpy import average
 import torch
 
-from src.data import PennTreeBank, get_dataloader
-from src.model import GPTNeo
+from src.data import PennTreeBank, Wikipedia, get_dataloader
+from src.model import AutoModel
 from src.utils import calculate_perplexity
 
 
-def run_model(
-    model: torch.nn.Module,
+def evaluate_model(
+    model: AutoModel,
     dataloader: torch.utils.data.DataLoader,
+    device: torch.device,
 ):
-    perplexity, avg_time = calculate_perplexity(model, dataloader)
-    print(f"perplexity: {perplexity}")
-    print(f"average inference time: {avg_time}")
-
-    mem_used_mb = torch.cuda.memory_allocated() / 1024**2
-    print(f"memory used: {mem_used_mb:.2f} MB")
+    memory = model.memory_footprint()
+    perplexity, average_latency = calculate_perplexity(model, dataloader, device)
+    logging.info(f"perplexity: {perplexity}")
+    logging.info(f"average latency: {average_latency}")
+    logging.info(f"memory footprint: {memory / 1e6} MB")
 
 
 def main():
-    logging.basicConfig(level=logging.INFO)
+    dataloader = get_dataloader(PennTreeBank(3000), batch_size=1)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = GPTNeo("./models", device)
+    logging.info(f"device: {device}")
+    model = AutoModel("./models", device, "gpt-neo")
 
-    dataloader = get_dataloader(PennTreeBank(), batch_size=1)
-    run_model(model, dataloader)
+    logging.info("running pre-trained model ... ")
+    evaluate_model(model, dataloader, device)
 
-    model.quantize()
+    model.quantize_custom(torch.int8)
 
-    run_model(model, dataloader)
+    logging.info("running quantized model ... ")
+    evaluate_model(model, dataloader, device)
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO, format="%(levelname)s - %(asctime)s : %(message)s"
+    )
     main()
