@@ -24,13 +24,11 @@ def get_model(quantisation_type: QuantisationType, cpu: bool = False) -> AutoMod
             ]
             model.quantize_custom(torch.int8, select_layers=select_layers)
         case QuantisationType.bnb_4:
-            model.bnb_quantize(4)
+            model.bnb_quantize_linear(4)
         case QuantisationType.bnb_8:
-            model.bnb_quantize(8)
+            model.bnb_quantize_linear(8)
         case QuantisationType.bnb_4_nf4:
-            model.bnb_quantize(4, nf4=True)
-        case QuantisationType.bnb_8_nf4:
-            model.bnb_quantize(8, nf4=True)
+            model.bnb_quantize_nf4()
         case QuantisationType.none:
             pass
         case _:

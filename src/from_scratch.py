@@ -287,13 +287,12 @@ def quantize_layers(
     select_layers: list[str] | None = None,
 ):
     for name, child in module.named_children():  # type: ignore
-        if select_layers is not None and name not in select_layers:
-            quantize_layers(child, goal_dtype, device, select_layers)
-            continue
-
-        if isinstance(child, nn.Linear):
+        can_quantize = select_layers is None or name in select_layers
+        if can_quantize and isinstance(child, nn.Linear):
             quantize_linear(module, name, child, goal_dtype, device)
-        elif isinstance(child, nn.Embedding):
+        elif can_quantize and isinstance(child, nn.Embedding):
             quantize_embedding(module, name, child, goal_dtype, device)
-        elif isinstance(child, nn.LayerNorm):
+        elif can_quantize and isinstance(child, nn.LayerNorm):
             quantize_layernorm(module, name, child, goal_dtype, device)
+        else:
+            quantize_layers(child, goal_dtype, device, select_layers)

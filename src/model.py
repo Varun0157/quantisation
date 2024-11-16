@@ -17,7 +17,6 @@ class QuantisationType(Enum):
     bnb_4 = "bnb_4"
     bnb_8 = "bnb_8"
     bnb_4_nf4 = "bnb_4_nf4"
-    bnb_8_nf4 = "bnb_8_nf4"
 
 
 class AutoModel(nn.Module):
@@ -49,23 +48,20 @@ class AutoModel(nn.Module):
         )
         quantize_layers(self.model, goal_dtype, self.device, select_layers)
 
-    def bnb_quantize(self, num_bytes: int, nf4: bool = False):
-        assert num_bytes in [4, 8], "only [4, 8] bytes supported"
-        quant_type = "nf4" if nf4 else "linear"
-        logging.info(
-            f"quantizing model to {num_bytes} bytes using bits_and_bytes {quant_type} ..."
+    def bnb_quantize_linear(self, num_bits: int):
+        assert num_bits in [4, 8], "only [4, 8] bytes supported"
+        logging.info(f"quantizing model to {num_bits} bytes using bits_and_bytes ...")
+
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=(num_bits == 4), load_in_8bit=(num_bits == 8)
+        )
+        self.model = AutoModelForCausalLM.from_pretrained(
+            self.mod_path, quantization_config=bnb_config, torch_dtype=torch.float32
         )
 
-        quant_type = "nf4" if nf4 else "fp4"
-        if num_bytes == 4:
-            bnb_config = BitsAndBytesConfig(
-                load_in_4bit=True, bnb_4bit_quant_type=quant_type
-            )
-        else:
-            bnb_config = BitsAndBytesConfig(
-                load_in_8bit=True, bnb_8bit_quant_type=quant_type
-            )
-
+    def bnb_quantize_nf4(self):
+        logging.info(f"quantizing model to 4 bytes using bits_and_bytes ...")
+        bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4")
         self.model = AutoModelForCausalLM.from_pretrained(
             self.mod_path, quantization_config=bnb_config, torch_dtype=torch.float32
         )

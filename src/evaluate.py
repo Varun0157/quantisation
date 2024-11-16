@@ -8,7 +8,7 @@ from src.model import AutoModel, QuantisationType
 from src.quantize import get_model
 
 
-def method_name(quant_method: QuantisationType):
+def get_method_name(quant_method: QuantisationType):
     return f"gpt-neo_{quant_method.value}"
 
 
@@ -24,28 +24,28 @@ def evaluate_model(
     logging.info(f"average latency: {average_latency}")
     logging.info(f"memory footprint: {memory / 1e6} MB")
 
-    res_file_name = f"./results/{method_name(quant_method)}.md"
+    res_file_name = f"./results/{get_method_name(quant_method)}.md"
     with open(res_file_name, "w") as f:
-        f.write(f"{quant_method.value}")
-        f.write(f"perplexity: {perplexity}")
-        f.write(f"average latency: {average_latency}")
+        f.write(f"perplexity: {perplexity}\n")
+        f.write(f"average latency: {average_latency}\n")
         f.write(f"memory_footprint: {memory / 1e6} MB")
 
 
 def main(quantisation_type: QuantisationType, cpu: bool = False):
-    model = get_model(quantisation_type, cpu)
-
-    logging.info("loading dataloader ...")
-    dataloader = get_dataloader(PennTreeBank(3000), batch_size=1)
-
     device = torch.device("cuda" if not cpu and torch.cuda.is_available() else "cpu")
+    
+    dataloader = get_dataloader(PennTreeBank(3000), batch_size=1)
+    
+    model = get_model(quantisation_type, cpu)
     model.to(device)
-
     model.load_state_dict(
         torch.load(
-            f"./quantized/{method_name(quantisation_type)}.pt", weights_only=True
-        )
+            f"./quantized/{get_method_name(quantisation_type)}.pt", weights_only=True
+        ),
+        strict=False,
     )
+    logging.info("model loaded")
+    
     evaluate_model(model, dataloader, device, quantisation_type)
 
 
