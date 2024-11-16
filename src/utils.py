@@ -1,4 +1,5 @@
 from typing import Tuple
+import time
 
 from tqdm import tqdm
 import torch
@@ -15,18 +16,15 @@ def calculate_perplexity(
     total_loss = 0.0
 
     total_latency = 0.0
-    start_time = torch.cuda.Event(enable_timing=True)
-    end_time = torch.cuda.Event(enable_timing=True)
 
     for sentences in tqdm(dataloader, "calculating perplexity...", ascii=" ▖▘▝▗▚▞█"):
         with torch.no_grad():
-            start_time.record(stream=torch.cuda.current_stream())
+            start_time = time.time()
             outputs = model(sentences)
-            end_time.record(stream=torch.cuda.current_stream())
-            torch.cuda.synchronize()
+            time_taken = time.time() - start_time
+            total_latency += time_taken
 
             loss = outputs.loss
-            total_latency += start_time.elapsed_time(end_time)
 
         assert not torch.isnan(loss).any(), f"NaN loss in batch {sentences}"
         total_loss += loss.item()

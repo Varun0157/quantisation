@@ -1,4 +1,5 @@
 import os
+import logging
 
 import torch
 import torch.nn as nn
@@ -23,7 +24,8 @@ class AutoModel(nn.Module):
         self.model.to(self.device)  # type: ignore
 
     def quantize_custom(self, goal_dtype: torch.dtype = torch.int8):
-        quantize_linear_layers(self.model, goal_dtype)
+        logging.info(f"quantizing model to {goal_dtype} ...")
+        quantize_linear_layers(self.model, goal_dtype, self.device)
 
     def memory_footprint(self):
         return self.model.get_memory_footprint()  # type: ignore
