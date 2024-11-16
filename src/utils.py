@@ -1,10 +1,13 @@
 from typing import Tuple
 import time
+import argparse
 
 from tqdm import tqdm
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+
+from src.model import QuantisationType
 
 
 def calculate_perplexity(
@@ -33,3 +36,24 @@ def calculate_perplexity(
     average_latency = total_latency / total_samples
 
     return perplexity, average_latency
+
+
+def get_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Quantisation script")
+    parser.add_argument(
+        "--q_type",
+        type=QuantisationType,
+        choices=list(QuantisationType),
+        default=QuantisationType.none,
+        help="Type of quantisation to apply",
+    )
+    parser.add_argument(
+        "--cpu",
+        action="store_true",
+        help="Run on CPU",
+    )
+    return parser
+
+
+def get_logging_format() -> str:
+    return "%(levelname)s - %(asctime)s : %(message)s"

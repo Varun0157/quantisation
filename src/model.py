@@ -1,12 +1,23 @@
 import os
 import logging
 from typing import List
+from enum import Enum
 
 import torch
 import torch.nn as nn
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 from src.from_scratch import quantize_layers
+
+
+class QuantisationType(Enum):
+    none = "none"
+    custom_whole = "custom_whole"
+    custom_selective = "custom_selective"
+    bnb_4 = "bnb_4"
+    bnb_8 = "bnb_8"
+    bnb_4_nf4 = "bnb_4_nf4"
+    bnb_8_nf4 = "bnb_8_nf4"
 
 
 class AutoModel(nn.Module):
