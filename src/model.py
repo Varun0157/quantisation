@@ -1,47 +1,37 @@
 import os
+
 import torch
 import torch.nn as nn
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from transformers import GPTNeoForCausalLM, GPT2Tokenizer
+from src.from_scratch import quantize_linear_layers
 
 
-class GPTNeo(nn.Module):
-    def __init__(self, models_path: str, device: torch.device):
+class AutoModel(nn.Module):
+    def __init__(self, models_path: str, device: torch.device, model_alias: str):
         super().__init__()
         self.device = device
 
-        tok_path = os.path.join(models_path, "gpt-neo_tokenizer")
-        mod_path = os.path.join(models_path, "gpt-neo_model")
-        self.tokenizer = GPT2Tokenizer.from_pretrained(tok_path)
+        self.tok_path = os.path.join(models_path, model_alias + "_tokenizer")
+        self.tokenizer = AutoTokenizer.from_pretrained(self.tok_path)
         self.tokenizer.pad_token = self.tokenizer.eos_token
 
-        self.model = GPTNeoForCausalLM.from_pretrained(mod_path)
+        self.mod_path = os.path.join(models_path, model_alias + "_model")
+        self.model: AutoModelForCausalLM = AutoModelForCausalLM.from_pretrained(
+            self.mod_path
+        )
         self.model.to(self.device)  # type: ignore
-        self.model.eval()
 
-    def quantize(self):
-        self.model = torch.quantization.quantize_dynamic(
-            self.model, {torch.nn.Linear}, dtype=torch.qint8
-        )
+    def quantize_custom(self, goal_dtype: torch.dtype = torch.int8):
+        quantize_linear_layers(self.model, goal_dtype)
 
-    def forward(self, prompt: str):
-        encodings = self.tokenizer(
-            prompt, return_tensors="pt", truncation=True, padding=True
-        )
-        input_ids = encodings["input_ids"].to(self.device)
-        attention_mask = encodings["attention_mask"].to(self.device)
+    def memory_footprint(self):
+        return self.model.get_memory_footprint()  # type: ignore
 
-        outputs = self.model(input_ids, attention_mask=attention_mask, labels=input_ids)
+    def forward(self, sentences: str):
+        encodings = self.tokenizer(sentences, return_tensors="pt", padding=True)
+        input_ids = encodings["input_ids"].to(self.device)  # type: ignore
+        attention_mask = encodings["attention_mask"].to(self.device)  # type: ignore
+
+        outputs = self.model(input_ids, attention_mask=attention_mask, labels=input_ids)  # type: ignore
         return outputs
-
-    @staticmethod
-    def quantize_tensor(tensor: torch.Tensor, dtype: torch.dtype) -> torch.Tensor:
-        NEW_MIN, NEW_MAX = torch.iinfo(dtype).min, torch.iinfo(dtype).max
-        OLD_MIN, OLD_MAX = tensor.min(), tensor.max()
-
-        VAL_RANGE = NEW_MAX - NEW_MIN
-        scale = (OLD_MAX - OLD_MIN) / VAL_RANGE
-        zero_point = OLD_MIN
-
-        quantized = torch.quantize_per_tensor(tensor, scale, zero_point, dtype)
-        return quantized
