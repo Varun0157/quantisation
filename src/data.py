@@ -49,12 +49,13 @@ class PennTreeBank(Dataset):
         return self.texts[idx]
 
 
+# NOTE: not tested, it takes like 30 gb
 class Wikipedia(Dataset):
     name = "Wikipedia"
 
     def __init__(self, num_sentences: int | None = None) -> None:
         logging.info(f"Loading {self.name} dataset...")
-        dataset = load_dataset("wikipedia", "20200501.en")
+        dataset = load_dataset("wikipedia", "20220301.en")
         assert type(dataset) == DatasetDict
 
         self.texts = clean(
