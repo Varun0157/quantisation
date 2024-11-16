@@ -286,14 +286,9 @@ def quantize_layers(
     for name, child in module.named_children():  # type: ignore
         if isinstance(child, nn.Linear):
             quantize_linear(module, name, child, goal_dtype, device)
-            continue
-
-        if isinstance(child, nn.Embedding):
+        elif isinstance(child, nn.Embedding):
             quantize_embedding(module, name, child, goal_dtype, device)
-            continue
-
-        if isinstance(child, nn.LayerNorm):
+        elif isinstance(child, nn.LayerNorm):
             quantize_layernorm(module, name, child, goal_dtype, device)
-            continue
-
-        quantize_layers(child, goal_dtype, device)
+        elif select_layers is not None and name in select_layers:
+            quantize_layers(child, goal_dtype, device, select_layers)
