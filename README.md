@@ -14,3 +14,7 @@ The model gets saved to `quantized`. Run it the same way you did before, instead
 `python -m src.evaluate --q_type <type>`. 
 
 Trained models can be found here: https://drive.google.com/drive/folders/1lHQnaPGtltS_SNNqdw4MLhvGHB0xKP1l?usp=sharing
+
+___
+
+For the gguf files in the submission, some reference commands ran were attached. These have to be run in a directory that has llama.cpp cloned and built. 
