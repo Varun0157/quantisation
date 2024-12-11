@@ -30,7 +30,7 @@ class PennTreeBank(Dataset):
         self.texts = clean(
             dataset["test"]["sentence"]
             + dataset["validation"]["sentence"]
-            # + dataset["train"]["sentence"]
+            + dataset["train"]["sentence"]
         )
 
         assert num_sentences is None or num_sentences <= len(

@@ -1,5 +1,3 @@
-import select
-from turtle import clear
 from typing import Tuple
 from transformers import AutoModelForCausalLM
 

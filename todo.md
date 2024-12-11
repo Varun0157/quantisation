@@ -2,3 +2,4 @@
   - [ ] in report, justify the use of PreTrainedModel loss if not. It uses CrossEntropy internally, etc. 
 - [ ] any way to avoid all the `# type: ignore`'s?
 - [ ] generalise to allow `facebook/opt-125m`
+- [ ] correct typos in report 

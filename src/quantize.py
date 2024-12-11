@@ -9,7 +9,7 @@ from src.utils import get_logging_format, get_parser
 def get_model(quantisation_type: QuantisationType, cpu: bool = False) -> AutoModel:
     device = torch.device("cuda" if not cpu and torch.cuda.is_available() else "cpu")
     logging.info(f"device: {device}")
-    model = AutoModel("./models", device, "gpt-neo")
+    model = AutoModel("models", device, "gpt-neo")
 
     match quantisation_type:
         case QuantisationType.custom_whole:
