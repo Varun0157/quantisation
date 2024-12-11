@@ -3,3 +3,4 @@
 - [ ] any way to avoid all the `# type: ignore`'s?
 - [ ] generalise to allow `facebook/opt-125m`
 - [ ] correct typos in report 
+- [ ] stop saving model locally, let hf cache handle it. Cleaner. 
