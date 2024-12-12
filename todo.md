@@ -4,3 +4,4 @@
 - [ ] generalise to allow `facebook/opt-125m`
 - [ ] correct typos in report 
 - [x] stop saving model locally, let hf cache handle it. Cleaner. 
+- [ ] os indepedent paths 
