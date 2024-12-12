@@ -6,11 +6,20 @@ Experiments in quantisation, consisting of quantisation from scratch (whole mode
 In addition, we deploy a device onto our local device using `llama.cpp`, quantise it, and upload it to the hugging face hub. 
 
 ## Custom Quantisation
-___
-build the dependencies by referring to the env files in docs. 
+
+### dependencies
+Refer to the [env file](./docs/envs.yml) to install the dependencies using `conda`. 
+```sh
+conda env create -f docs/envs.yml
+```
+
+### quantisation
 
 Quantize `gpt-neo` using your method of choice using `python -m src.quantize --q_type <type>`. 
-Types include `custom_whole`, `custom_selective`, `bnb_4`, `bnb_8`, `bnb_nf4` and `none`. 
+
+Types include `custom_whole`, `custom_selective`, `bnb_4`, `bnb_8`, `bnb_nf4` 
+and `none`. 
+
 `custom_whole` takes a lot of memory during inference and may have to be run with the `--cpu` flag. 
 
 The model gets saved to `quantized`. Run it the same way you did before, instead on the evaluate model, to evaluate:
@@ -18,6 +27,39 @@ The model gets saved to `quantized`. Run it the same way you did before, instead
 
 Trained models can be found here: https://drive.google.com/drive/folders/1lHQnaPGtltS_SNNqdw4MLhvGHB0xKP1l?usp=sharing
 
-___
+### llama.cpp
+Set up the `llama.cpp` submodule stored in the [llama.cpp](./llama.cpp/) directory as below:
+```sh
+git submodule init
+git submodule update
+```
 
-For the gguf files in the submission, some reference commands ran were attached. These have to be run in a directory that has llama.cpp cloned and built. 
+The remaining code assumes you're in the `llama.cpp` directory. 
+```sh
+cd llama.cpp
+conda env create -f envs.yml && conda activate llama-cpp
+```
+
+Build the executables by referring to the [original directory](https://github.com/ggerganov/llama.cpp/blob/master/docs/build.md). 
+
+Download `hf-smol-135m` from huggingface to quantise:
+```sh
+python download.py
+```
+
+Quantise the model using the llama-cli executable:
+```sh
+python llama.cpp/convert_hf_to_gguf.py hf-smol \
+  --outfile hf-smol.gguf \
+  --outtype q8_0
+```
+
+Prompt the model with whatever input you want:
+```sh
+./llama.cpp/build/bin/llama-cli -m hf-smol.gguf -p "What is life?"
+```
+
+If you want, upload the model to hugging-face by referring to and modifying `upload.py` as required:
+```sh
+python upload.py
+```
