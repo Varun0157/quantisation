@@ -1,4 +1,5 @@
 import logging
+import os
 
 import torch
 
@@ -33,18 +34,18 @@ def evaluate_model(
 
 def main(quantisation_type: QuantisationType, cpu: bool = False):
     model_name = "EleutherAI/gpt-neo-125m"
-    # model_name = "facebook/opt-125m"
 
     device = torch.device("cuda" if not cpu and torch.cuda.is_available() else "cpu")
 
     dataloader = get_dataloader(PennTreeBank(3000), batch_size=1)
 
+    best_model_path = os.path.join(
+        "quantized", f"{get_method_name(quantisation_type)}.pt"
+    )
     model = get_model(model_name, quantisation_type, cpu)
     model.to(device)
     model.load_state_dict(
-        torch.load(
-            f"./quantized/{get_method_name(quantisation_type)}.pt", weights_only=True
-        ),
+        torch.load(best_model_path, weights_only=True),
         strict=False,
     )
     logging.info("model loaded")

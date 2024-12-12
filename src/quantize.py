@@ -1,7 +1,9 @@
 import logging
+import os
 
 import torch
 
+from evaluate import get_method_name
 from src.model import AutoModel, QuantisationType
 from src.utils import get_logging_format, get_parser
 
@@ -47,8 +49,9 @@ def main(quantisation_type: QuantisationType, cpu: bool = False):
     model = get_model(model_name, quantisation_type, cpu)
     logging.info(f"model: {model}")
     # save the model locally
+    model_path = os.path.join("quantized", f"{get_method_name(quantisation_type)}.pt")
     logging.info("saving model ...")
-    torch.save(model.state_dict(), f"./quantized/gpt-neo_{quantisation_type.value}.pt")
+    torch.save(model.state_dict(), model_path)
 
 
 if __name__ == "__main__":
