@@ -11,7 +11,7 @@ from src.model import QuantisationType
 
 
 def calculate_perplexity(
-    model: nn.Module, dataloader: DataLoader, device: torch.device
+    model: nn.Module, dataloader: DataLoader
 ) -> Tuple[float, float]:
     model.eval()
 

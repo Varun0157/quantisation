@@ -16,11 +16,10 @@ def get_method_name(quant_method: QuantisationType):
 def evaluate_model(
     model: AutoModel,
     dataloader: torch.utils.data.DataLoader,
-    device: torch.device,
     quant_method: QuantisationType,
 ):
     memory = model.memory_footprint()
-    perplexity, average_latency = calculate_perplexity(model, dataloader, device)
+    perplexity, average_latency = calculate_perplexity(model, dataloader)
     logging.info(f"perplexity: {perplexity}")
     logging.info(f"average latency: {average_latency}")
     logging.info(f"memory footprint: {memory / 1e6} MB")
@@ -50,7 +49,7 @@ def main(quantisation_type: QuantisationType, cpu: bool = False):
     )
     logging.info("model loaded")
 
-    evaluate_model(model, dataloader, device, quantisation_type)
+    evaluate_model(model, dataloader, quantisation_type)
 
 
 if __name__ == "__main__":
