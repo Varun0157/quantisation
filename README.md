@@ -14,6 +14,7 @@ conda env create -f docs/envs.yml
 ```
 
 ### quantisation
+**reference**: https://github.com/ggerganov/llama.cpp/discussions/2948
 
 Quantize `gpt-neo` using your method of choice using:
 ```sh
