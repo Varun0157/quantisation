@@ -52,14 +52,14 @@ Download `hf-smol-135m` from huggingface to quantise:
 python download.py
 ```
 
-Quantise the model using the llama-cli executable:
+Quantise the model using `llama.cpp`:
 ```sh
 python llama.cpp/convert_hf_to_gguf.py hf-smol \
   --outfile hf-smol.gguf \
   --outtype q8_0
 ```
 
-Prompt the model with whatever input you want:
+Prompt the model with whatever input you want using the `llama-cli` executable:
 ```sh
 ./llama.cpp/build/bin/llama-cli -m hf-smol.gguf -p "What is life?"
 ```
