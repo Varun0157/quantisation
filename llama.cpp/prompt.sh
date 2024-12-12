@@ -1,0 +1,1 @@
+./llama.cpp/build/bin/llama-cli -m hf-smol.gguf -p "What is life?"

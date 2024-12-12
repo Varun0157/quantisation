@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
+# ref: https://medium.com/@govindarajpriyanthan/build-an-8-bit-custom-quantizer-from-scratch-a-comprehensive-guide-69d34486f89a
 class Qint_Linear(nn.Module):
     def __init__(
         self,

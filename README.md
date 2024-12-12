@@ -1,6 +1,11 @@
 # quantisation
-Assignment 4 of Advanced Natural Language Processing (Monsoon '24)
+*Assignment 4* of *Advanced Natural Language Processing* (IIIT-Hyderabad, Monsoon '24)
 
+Experiments in quantisation, consisting of quantisation from scratch (whole model and selective) as well as `bitsandbytes` integration, with quantisation to 4 bit and 8 bit formats and `nf4` quantisation. 
+
+In addition, we deploy a device onto our local device using `llama.cpp`, quantise it, and upload it to the hugging face hub. 
+
+## Custom Quantisation
 ___
 build the dependencies by referring to the env files in docs. 
 
