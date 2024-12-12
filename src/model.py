@@ -20,17 +20,15 @@ class QuantisationType(Enum):
 
 
 class AutoModel(nn.Module):
-    def __init__(self, models_path: str, device: torch.device, model_alias: str):
+    def __init__(self, model_name: str, device: torch.device):
         super().__init__()
         self.device = device
 
-        self.tok_path = os.path.join(models_path, model_alias + "_tokenizer")
-        self.tokenizer = AutoTokenizer.from_pretrained(self.tok_path)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.tokenizer.pad_token = self.tokenizer.eos_token
 
-        self.mod_path = os.path.join(models_path, model_alias + "_model")
         self.model: AutoModelForCausalLM = AutoModelForCausalLM.from_pretrained(
-            self.mod_path
+            model_name
         )
         self.model.to(self.device)  # type: ignore
         self.model.eval()  # type: ignore
