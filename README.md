@@ -15,7 +15,10 @@ conda env create -f docs/envs.yml
 
 ### quantisation
 
-Quantize `gpt-neo` using your method of choice using `python -m src.quantize --q_type <type>`. 
+Quantize `gpt-neo` using your method of choice using:
+```sh
+python -m src.quantize --q_type <type>
+```
 
 Types include `custom_whole`, `custom_selective`, `bnb_4`, `bnb_8`, `bnb_nf4` 
 and `none`. 
@@ -23,11 +26,13 @@ and `none`.
 `custom_whole` takes a lot of memory during inference and may have to be run with the `--cpu` flag. 
 
 The model gets saved to `quantized`. Run it the same way you did before, instead on the evaluate model, to evaluate:
-`python -m src.evaluate --q_type <type>`. 
+```sh
+python -m src.evaluate --q_type <type>. 
+```
 
-Trained models can be found here: https://drive.google.com/drive/folders/1lHQnaPGtltS_SNNqdw4MLhvGHB0xKP1l?usp=sharing
+Quantised models can be found here: https://drive.google.com/drive/folders/1lHQnaPGtltS_SNNqdw4MLhvGHB0xKP1l?usp=sharing
 
-### llama.cpp
+## llama.cpp
 Set up the `llama.cpp` submodule stored in the [llama.cpp](./llama.cpp/) directory as below:
 ```sh
 git submodule init
