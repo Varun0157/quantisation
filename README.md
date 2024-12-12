@@ -14,7 +14,6 @@ conda env create -f docs/envs.yml
 ```
 
 ### quantisation
-**reference**: https://github.com/ggerganov/llama.cpp/discussions/2948
 
 Quantize `gpt-neo` using your method of choice using:
 ```sh
@@ -34,6 +33,8 @@ python -m src.evaluate --q_type <type>.
 Quantised models can be found here: https://drive.google.com/drive/folders/1lHQnaPGtltS_SNNqdw4MLhvGHB0xKP1l?usp=sharing
 
 ## llama.cpp
+**reference**: https://github.com/ggerganov/llama.cpp/discussions/2948
+
 Set up the `llama.cpp` submodule stored in the [llama.cpp](./llama.cpp/) directory as below:
 ```sh
 git submodule init
