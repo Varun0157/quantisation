@@ -6,11 +6,12 @@ from src.model import AutoModel, QuantisationType
 from src.utils import get_logging_format, get_parser
 
 
-def get_model(quantisation_type: QuantisationType, cpu: bool = False) -> AutoModel:
+def get_model(
+    model_name: str, quantisation_type: QuantisationType, cpu: bool = False
+) -> AutoModel:
     device = torch.device("cuda" if not cpu and torch.cuda.is_available() else "cpu")
     logging.info(f"device: {device}")
-    model_name = "EleutherAI/gpt-neo-125m"
-    # model_name = "facebook/opt-125m"
+
     model = AutoModel(model_name, device)
 
     match quantisation_type:
@@ -40,7 +41,10 @@ def get_model(quantisation_type: QuantisationType, cpu: bool = False) -> AutoMod
 
 
 def main(quantisation_type: QuantisationType, cpu: bool = False):
-    model = get_model(quantisation_type, cpu)
+    model_name = "EleutherAI/gpt-neo-125m"
+    # model_name = "facebook/opt-125m"
+
+    model = get_model(model_name, quantisation_type, cpu)
     logging.info(f"model: {model}")
     # save the model locally
     logging.info("saving model ...")

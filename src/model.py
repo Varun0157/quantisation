@@ -24,11 +24,13 @@ class AutoModel(nn.Module):
         super().__init__()
         self.device = device
 
+        self.model_name = model_name
+
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.tokenizer.pad_token = self.tokenizer.eos_token
 
         self.model: AutoModelForCausalLM = AutoModelForCausalLM.from_pretrained(
-            model_name
+            self.model_name
         )
         self.model.to(self.device)  # type: ignore
         self.model.eval()  # type: ignore
@@ -54,14 +56,14 @@ class AutoModel(nn.Module):
             load_in_4bit=(num_bits == 4), load_in_8bit=(num_bits == 8)
         )
         self.model = AutoModelForCausalLM.from_pretrained(
-            self.mod_path, quantization_config=bnb_config, torch_dtype=torch.float32
+            self.model_name, quantization_config=bnb_config, torch_dtype=torch.float32
         )
 
     def bnb_quantize_nf4(self):
         logging.info(f"quantizing model to 4 bytes using bits_and_bytes ...")
         bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4")
         self.model = AutoModelForCausalLM.from_pretrained(
-            self.mod_path, quantization_config=bnb_config, torch_dtype=torch.float32
+            self.model_name, quantization_config=bnb_config, torch_dtype=torch.float32
         )
 
     def memory_footprint(self):
