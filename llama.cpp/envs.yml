@@ -1,5 +1,0 @@
-name: llama-cpp
-channels:
-  - conda-forge
-  - defaults
-prefix: /home/varun/miniconda3/envs/llama-cpp

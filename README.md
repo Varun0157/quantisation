@@ -44,10 +44,12 @@ git submodule update
 The remaining code assumes you're in the `llama.cpp` directory. 
 ```sh
 cd llama.cpp
-conda env create -f envs.yml && conda activate llama-cpp
 ```
 
-Build the executables by referring to the [original directory](https://github.com/ggerganov/llama.cpp/blob/master/docs/build.md). 
+Build the executables by referring to the [original directory](https://github.com/ggerganov/llama.cpp/blob/master/docs/build.md).
+
+> [!NOTE]  
+> `huggingface-hub` is required to download and upload models
 
 Download `hf-smol-135m` from huggingface to quantise:
 ```sh
